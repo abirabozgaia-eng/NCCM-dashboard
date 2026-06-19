@@ -22,7 +22,7 @@ st.markdown("""
     .kpi-box { background-color: #262626; padding: 20px; border-radius: 10px; border-left: 5px solid #ff4b4b; text-align: center; }
     .system-status { background-color: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #3b82f6; color: #e2e8f0; font-size: 16px; line-height: 1.6; }
     </style>
-""", unsafe_allow_index=True)
+""", unsafe_allow_html=True)
 
 # 2. إعدادات الربط البرمجي الفعلي مع منصة Stitch AI (API Integration)
 STITCH_API_KEY = "AQ.Ab8RN6KqG9lhyWQ9lhb2NAn_urbE3sZqKO88Yh_9ImOxzwHqRg"
