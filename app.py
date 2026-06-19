@@ -58,13 +58,13 @@ st.subheader("المركز الوطني للقيادة والسيطرة | الب
 # عرض المؤشرات الحيوية الرقمية (KPIs) لغرف الطوارئ
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.markdown('<div class="kpi-box"><h4>🔴 الأزمات النشطة</h4><h2>3 مناطق حرجـة</h2></div>', unsafe_allow_index=True)
+    st.markdown('<div class="kpi-box"><h4>🔴 الأزمات النشطة</h4><h2>3 مناطق حرجـة</h2></div>', unsafe_allow_html=True)
 with col2:
-    st.markdown('<div class="kpi-box"><h4>🌐 البلديات المتصلة</h4><h2>14 / 14 بلديات</h2></div>', unsafe_allow_index=True)
+    st.markdown('<div class="kpi-box"><h4>🌐 البلديات المتصلة</h4><h2>14 / 14 بلديات</h2></div>', unsafe_allow_html=True)
 with col3:
-    st.markdown('<div class="kpi-box"><h4>⚠️ تنبيهات الإخلاء</h4><h2>2 بـلاغ معلّـق</h2></div>', unsafe_allow_index=True)
+    st.markdown('<div class="kpi-box"><h4>⚠️ تنبيهات الإخلاء</h4><h2>2 بـلاغ معلّـق</h2></div>', unsafe_allow_html=True)
 with col4:
-    st.markdown('<div class="kpi-box"><h4>🛡️ السيادة الرقمية</h4><h2>مؤمن بالكامل</h2></div>', unsafe_allow_index=True)
+    st.markdown('<div class="kpi-box"><h4>🛡️ السيادة الرقمية</h4><h2>مؤمن بالكامل</h2></div>', unsafe_allow_html=True)
 
 st.write("---")
 
@@ -90,7 +90,7 @@ with col_output:
     if submit_btn:
         with st.spinner("جاري الاتصال الآمن بالـ API واستخراج البيانات الذكية..."):
             ai_response = call_stitch_ai_engine(full_prompt)
-            st.markdown(f'<div class="system-status"><b>الاستجابة الفورية للمحرك الموحد:</b><br><br>{ai_response}</div>', unsafe_allow_index=True)
+            st.markdown(f'<div class="system-status"><b>الاستجابة الفورية للمحرك الموحد:</b><br><br>{ai_response}</div>', unsafe_allow_html=True)
     else:
         st.info("💡 أدخل بيانات البلاغ واضغط على الزر لإرسالها ومعالجتها حياً عبر الـ API.")
 
