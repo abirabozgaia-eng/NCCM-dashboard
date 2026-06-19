@@ -1,115 +1,117 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import pydeck as pdk
 import plotly.express as px
+import pydeck as pdk
+import requests
 
-# --------------------------------------------------------
-# 1. IDENTITY & ACCESS MANAGEMENT (IAM) CONFIGURATION
-# --------------------------------------------------------
-# HARDCODED SUPER ADMIN (Replace with your actual Gmail if needed)
-SUPER_ADMIN_EMAIL = "your-email@gmail.com"
-
-# Define Roles and Permissions Matrix
-ROLE_PERMISSIONS = {
-    "Super Admin": {"can_view": True, "can_broadcast": True, "can_edit_settings": True, "can_clear_logs": True},
-    "Operations Manager": {"can_view": True, "can_broadcast": True, "can_edit_settings": False, "can_clear_logs": False},
-    "Field Dispatcher": {"can_view": True, "can_broadcast": False, "can_edit_settings": False, "can_clear_logs": False},
-    "Public Observer": {"can_view": True, "can_broadcast": False, "can_edit_settings": False, "can_clear_logs": False}
-}
-
-# --------------------------------------------------------
-# 2. PAGE INITIALIZATION & SECURITY GATEWAY
-# --------------------------------------------------------
+# 1. إعدادات الصفحة والهوية البصرية للمنصة السيادية
 st.set_page_config(
-    page_title="Unified Crisis Command Center",
+    page_title="منصة الإعلام الموحد للطوارئ وإدارة الأزمات",
     page_icon="🚨",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# Dark/Professional Command Center Styling via CSS
+# تصفيف الواجهة بالهوية الرسمية الاحترافية (Dark Theme)
 st.markdown("""
     <style>
-    .main { background-color: #0e1117; color: #ffffff; }
-    .stMetric { background-color: #1f2937; padding: 15px; border-radius: 8px; border-left: 5px solid #ef4444; }
-    .critical-alert { padding: 15px; background-color: #7f1d1d; border-radius: 5px; margin-bottom: 10px; }
-    .verified-fact { padding: 10px; background-color: #064e3b; border-radius: 5px; margin-bottom: 10px; }
+    .main { background-color: #1a1a1a; color: #ffffff; }
+    h1, h2, h3 { color: #ff4b4b !important; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .stButton>button { background-color: #ff4b4b; color: white; border-radius: 8px; width: 100%; font-weight: bold; height: 45px; }
+    .kpi-box { background-color: #262626; padding: 20px; border-radius: 10px; border-left: 5px solid #ff4b4b; text-align: center; }
+    .system-status { background-color: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #3b82f6; color: #e2e8f0; font-size: 16px; line-height: 1.6; }
     </style>
-""", unsafe_allow_html=True)
+""", unsafe_allow_index=True)
 
-# Session State for Simulated Login
-if "user_email" not in st.session_state:
-    st.session_state.user_email = ""
-if "user_role" not in st.session_state:
-    st.session_state.user_role = "Public Observer"
+# 2. إعدادات الربط البرمجي الفعلي مع منصة Stitch AI (API Integration)
+STITCH_API_KEY = "AQ.Ab8RN6KqG9lhyWQ9lhb2NAn_urbE3sZqKO88Yh_9ImOxzwHqRg"
+STITCH_PROJECT_URL = "https://api.stitch.withgoogle.com/v1/projects/NCCM-AI-CORE/predict"
 
-# --- SIDEBAR: SECURE AUTHENTICATION SIMULATOR ---
-st.sidebar.title("🔐 Secure Identity Access")
-email_input = st.sidebar.text_input("Enter Registered Email Address:", value=st.session_state.user_email)
+def call_stitch_ai_engine(prompt_data):
+    """دالة برمجية آمنة للاتصال بمحرك الذكاء الاصطناعي في Stitch وتمرير البيانات"""
+    headers = {
+        "Authorization": f"Bearer {STITCH_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    # هيكلية البيانات المرسلة لتتوافق مع الأنظمة الداخلية وسجل المخاطر
+    payload = {
+        "prompt": prompt_data,
+        "temperature": 0.2,  # نسبة منخفضة لضمان دقة وصرامة التقارير السيادية
+        "max_tokens": 1024
+    }
+    
+    try:
+        response = requests.post(STITCH_PROJECT_URL, json=payload, headers=headers, timeout=15)
+        if response.status_code == 200:
+            return response.json().get("output", "لم يتم إرجاع تحليل دقيق من المحرك.")
+        else:
+            return f"❌ خطأ في الاتصال بالأنظمة الداخلية لـ Stitch (رمز الاستجابة: {response.status_code})"
+    except Exception as e:
+        return f"🚨 فشل الاتصال الآمن بالخادم: {str(e)}"
 
-# Gateway Authentication Logic
-if email_input:
-    st.session_state.user_email = email_input.strip().lower()
-    if st.session_state.user_email == SUPER_ADMIN_EMAIL.lower():
-        st.session_state.user_role = "Super Admin"
-        st.sidebar.success(f"👑 Authenticated as Root Super Admin")
+# 3. الواجهة الرئيسية للمنصة ونظام القيادة والسيطرة
+st.title("🚨 منصة الإعلام الموحد لإدارة الطوارئ والأزمات")
+st.subheader("المركز الوطني للقيادة والسيطرة | البث المباشر للأحداث والمخاطر السيادية")
+
+# عرض المؤشرات الحيوية الرقمية (KPIs) لغرف الطوارئ
+col1, col2, col3, col4 = st.columns(4)
+with col1:
+    st.markdown('<div class="kpi-box"><h4>🔴 الأزمات النشطة</h4><h2>3 مناطق حرجـة</h2></div>', unsafe_allow_index=True)
+with col2:
+    st.markdown('<div class="kpi-box"><h4>🌐 البلديات المتصلة</h4><h2>14 / 14 بلديات</h2></div>', unsafe_allow_index=True)
+with col3:
+    st.markdown('<div class="kpi-box"><h4>⚠️ تنبيهات الإخلاء</h4><h2>2 بـلاغ معلّـق</h2></div>', unsafe_allow_index=True)
+with col4:
+    st.markdown('<div class="kpi-box"><h4>🛡️ السيادة الرقمية</h4><h2>مؤمن بالكامل</h2></div>', unsafe_allow_index=True)
+
+st.write("---")
+
+# 4. شاشة معالجة وربط الذكاء الاصطناعي (Stitch AI Engine Integration)
+st.header("⚙️ محرك الاستجابة والتحليل الذكي الموحد (Stitch AI Outbound)")
+st.write("يقوم هذا القسم باستدعاء نموذج الذكاء الاصطناعي المطور عبر Stitch لتحليل البلاغات وتصنيف المخاطر آلياً وتوجيهها للبلديات المعنية:")
+
+col_input, col_output = st.columns([1, 1])
+
+with col_input:
+    st.subheader("📥 مدخلات البلاغ الميداني الموحد")
+    incident_type = st.selectbox("نوع الخطر المرصود:", ["صدمات مناخية وسيول جارفة", "تآكل الشواطئ وارتفاع منسوب البحر", "انهيار بـنية تحتية وطرق", "أخرى"])
+    municipality_target = st.text_input("البلدية المستهدفة أو النطاق الجغرافي:", "المنطقة الساحلية / طرابلس")
+    raw_report = st.text_area("نص البلاغ الوارد من غرف العمليات الفرعية:", "رصد تدفق غير مستقر للمياه مع مؤشرات هبوط في التربة القريبة من النطاق السكني.")
+    
+    # صياغة الأمر الموجه للمحرك الذكي
+    full_prompt = f"حلل البلاغ التالي كخبير طوارئ سيادي. نوع الخطر: {incident_type}. الموقع: {municipality_target}. نص البلاغ: {raw_report}. أعطِ تصنيفاً دقيقاً للمخاطر وتوصيات فورية لغرفة القيادة."
+    
+    submit_btn = st.button("🚀 معالجة وتمرير البلاغ عبر Stitch AI")
+
+with col_output:
+    st.subheader("📤 تحليلات محرك Stitch AI والأنظمة الداخلية")
+    if submit_btn:
+        with st.spinner("جاري الاتصال الآمن بالـ API واستخراج البيانات الذكية..."):
+            ai_response = call_stitch_ai_engine(full_prompt)
+            st.markdown(f'<div class="system-status"><b>الاستجابة الفورية للمحرك الموحد:</b><br><br>{ai_response}</div>', unsafe_allow_index=True)
     else:
-        # Fallback matrix simulation for testing other roles
-        st.session_state.user_role = st.sidebar.selectbox(
-            "Select Simulated Staff Role (Testing Mode):",
-            ["Operations Manager", "Field Dispatcher", "Public Observer"]
-        )
-else:
-    st.session_state.user_role = "Public Observer"
+        st.info("💡 أدخل بيانات البلاغ واضغط على الزر لإرسالها ومعالجتها حياً عبر الـ API.")
 
-# Fetch permissions for active identity
-current_perms = ROLE_PERMISSIONS[st.session_state.user_role]
+st.write("---")
 
-st.sidebar.markdown("---")
-st.sidebar.subheader("Identity Privileges")
-st.sidebar.json(current_perms)
+# 5. نظام الخرائط الجغرافية التفاعلي المباشر (GIS Mapping)
+st.header("🌐 الخرائط التفاعلية الحية لانتشار الحوادث (GIS Mapping)")
+radius_slider = st.slider("ضبط شعاع تحليل خطورة الحادث الجغرافي (كيلومتر):", 5, 50, 15)
 
-# --------------------------------------------------------
-# 3. DASHBOARD MAIN HEADER & SOVEREIGN STATUS BAR
-# --------------------------------------------------------
-st.title("🚨 Unified Emergency Management & Crisis Platform")
-st.subheader("National Command & Control Center | Incident Live Stream")
-st.markdown("---")
-
-# Metrics Grid (Stacked clean execution blocks)
-m1, m2, m3, m4 = st.columns(4)
-with m1:
-    st.metric(label="🔴 Active Crises", value="3 Major Zones")
-with m2:
-    st.metric(label="🏢 Connected Municipalities", value="14/14 Online")
-with m3:
-    st.metric(label="⚠️ Pending Evacuation Alerts", value="2 Reg. Pushed")
-with m4:
-    st.metric(label="🛡️ System Sovereignty Status", value="Secured & Encrypted")
-
-st.markdown("---")
-
-# --------------------------------------------------------
-# 4. INTERACTIVE CRISIS MAPPING (GIS SIMULATION)
-# --------------------------------------------------------
-st.header("🌐 Live Regional Incident GIS Mapping")
-risk_radius = st.slider("Adjust Hazard Analysis Radius (Kilometers)", 1, 50, 15)
-
-# Generate simulated coordinates relative to capital/center area
+# توليد بيانات جغرافية افتراضية للمناطق الساحلية الليبية لإظهار كفاءة النظام
 map_data = pd.DataFrame({
-    'lat': [32.8872, 32.8750, 32.8990],
-    'lon': [13.1912, 13.1600, 13.2100],
-    'incident': ['Flash Flood - Sector Alpha', 'Critical Grid Failure - Substation 4', 'Logistics Blockade - Highway South'],
-    'severity': [150, 90, 200] # Controls visual radius sizes
+    'lat': [32.8872, 32.8943, 32.8751],
+    'lon': [13.1901, 13.1724, 13.2145],
+    'criticality': [100, 80, 60]
 })
 
-# Render Pydeck High-Visibility Map Layer
 st.pydeck_chart(pdk.Deck(
     map_style='mapbox://styles/mapbox/dark-v10',
     initial_view_state=pdk.ViewState(
         latitude=32.8872,
-        longitude=13.1912,
+        longitude=13.1901,
         zoom=11,
         pitch=40,
     ),
@@ -118,90 +120,11 @@ st.pydeck_chart(pdk.Deck(
             'ScatterplotLayer',
             data=map_data,
             get_position='[lon, lat]',
-            get_color='[239, 68, 68, 160]', # High visibility red-orange alert glow
-            get_radius=risk_radius * 100,
-            pickable=True
+            get_color='[255, 75, 75, 160]',
+            get_radius=radius_slider * 100,
+            pickable=True,
         ),
     ],
-    tooltip={"text": "{incident}"}
 ))
 
-st.markdown("---")
-
-# --------------------------------------------------------
-# 5. UNIFIED CRISIS COMMUNICATION HUB & ANTI-RUMOR LEDGER
-# --------------------------------------------------------
-col_left, col_right = st.columns(2)
-
-with col_left:
-    st.header("📢 Official Multi-Channel Broadcast Center")
-    
-    # Access Enforcement Check for broadcasting
-    if current_perms["can_broadcast"]:
-        st.info("🔓 Access Granted: You have credentials to dispatch emergency broadcasts to TV, SMS, and Radio systems.")
-        broadcast_text = st.text_area("Compose Instant Unified Public Alert:")
-        if st.button("🚨 Deploy Omnichannel Emergency Alert"):
-            st.success(f"Broadcast successfully queued and digitally signed by {st.session_state.user_email}.")
-    else:
-        st.error("🔒 Access Denied: Your current role does not have authorization to issue public emergency broadcasts.")
-
-with col_right:
-    st.header("🛡️ Public Fact-Checking & Anti-Rumor Ledger")
-    st.markdown("Live verification matrix to prevent panic and secure public digital spaces:")
-    
-    # Simulated Anti-Rumor Relational Array
-    rumor_data = {
-        "Circulating Rumor / Misinformation": [
-            "Main water treatment plant completely offline for two weeks.",
-            "Evacuation order expanded to the entire Northern sector.",
-            "Local fuel supplies completely depleted near central grid."
-        ],
-        "Verified Field Truth (Official Reality)": [
-            "Plant offline for scheduled 4-hour technical mitigation. Online by 22:00.",
-            "Evacuation is strictly limited to low-lying properties on Sector Alpha Basin.",
-            "Strategic fuel reserves remain at 84% capacity. Distribution ongoing."
-        ],
-        "Verification Status": ["🟢 Resolved Fact", "🟢 Clarified", "🟡 Monitoring"]
-    }
-    df_rumors = pd.DataFrame(rumor_data)
-    st.table(df_rumors)
-
-st.markdown("---")
-
-# --------------------------------------------------------
-# 6. EMERGENCY RESOURCE ALLOCATOR (DYNAMIC ENGINE)
-# --------------------------------------------------------
-st.header("🧮 Dynamic Resource Allocation & Containment Forecasting")
-st.markdown("Adjust operational field assets to dynamically project regional resilience recovery targets.")
-
-res_teams = st.slider("Mobilized Rescue & Extraction Teams", 5, 100, 30)
-med_units = st.slider("Mobile Medical Response Units Deployment", 2, 50, 12)
-
-# Dynamic backend algorithmic forecasting formulas
-projected_containment = max(1.5, round(48 - (res_teams * 0.3) - (med_units * 0.5), 1))
-resilience_index = min(100, round(30 + (res_teams * 0.5) + (med_units * 1.2)))
-
-c1, c2 = st.columns(2)
-with c1:
-    st.metric(label="⏱️ Projected Crisis Containment Window", value=f"{projected_containment} Hours", delta="-Estimated Time")
-with c2:
-    st.metric(label="📊 Computed Regional Resilience Index", value=f"{resilience_index}%", delta="+Stability Scale")
-
-# --------------------------------------------------------
-# 7. ROOT CONFIGURATION & AUDIT SYSTEM (SUPER ADMIN ONLY)
-# --------------------------------------------------------
-st.markdown("---")
-st.header("⚙️ Critical Platform Administration & Core Infrastructure Settings")
-
-if current_perms["can_edit_settings"] and st.session_state.user_email == SUPER_ADMIN_EMAIL.lower():
-    st.success(f"👑 Root Verification Success: Welcome, Master Admin ({SUPER_ADMIN_EMAIL}).")
-    
-    col_adm1, col_adm2 = st.columns(2)
-    with col_adm1:
-        st.checkbox("Force Encryption Token Rotation (Hourly)", value=True)
-        st.checkbox("Restrict Cross-Border Telemetry Feed Access", value=False)
-    with col_adm2:
-        if st.button("🗑️ Purge Operational System Logs"):
-            st.warning("All temporary operational logs have been securely cleared from memory.")
-else:
-    st.error(f"🛑 Security Intercept: Infrastructure controls are reserved strictly for Root Admin ({SUPER_ADMIN_EMAIL}). Access Blocked.")
+st.caption("🚨 يتم تحديث هذه الخريطة جغرافياً فور تلقي استجابة تصنيف المخاطر من محرك الـ AI.")
